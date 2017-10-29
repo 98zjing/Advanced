@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>encapsulation</title>
+</head>
+<body>
+	<div id="div1"></div>
+	<script>
+		var myObject=(function(){
+			var _name='sven';
+			return {
+				getName:function(){
+					var ss='22';
+					return _name;
+				}
+			}
+		})();
+		console.log(myObject.getName());
+		console.log(myObject._name);
+		// var getId=document.getElementById;
+		// getId('div1');
+		var cache={};
+		var mult=function(){
+			var args=Array.prototype.join.call(arguments,',');
+			if (cache[args]) {
+				return cache[args];
+			}
+			var a=1;
+			for (var i = 0, l = arguments.length; i < l; i++) {
+				a=a*arguments[i];
+			}
+			return cache[args]=a;
+		};
+		console.log(mult(3,2,2));
+		console.log(mult(3,2,2));
+		var appendDiv=function(callbck){
+			for (var i = 0; i < 100; i++) {
+				var div=document.createElement('div');
+				div.innerHTML=i;
+				document.body.appendChild(div);
+				if (typeof callbck === "function") {
+					callbck(div);
+				}
+			}
+		}
+		appendDiv(function(node){
+			node.style.display = 'none';
+		});
+		var currying=function(fn){
+			var args=[];
+			alert();
+			return function(){       //函数根据传入的参数执行相应的操作
+				if (arguments.length === 0) {
+					return fn.apply(this,args);    //返回fn的运行结果，也就是cost的运行结果
+				}else {
+					[].push.apply(args,arguments);
+					return arguments.callee;
+				}
+			}
+		};
+		var cost = (function(){
+			var money = 0;
+			return function(){
+				for (var i = 0 , l = arguments.length; i < l; i++) {
+					money += arguments[i];
+				}
+				return money;
+			}
+		})();                  //函数自我调用返回一个函数
+		var cont = currying(cost);    //调用函数currying返回一个函数
+		cont( 100 );         //调用返回的函数
+		cont( 200 );         //调用返回的函数
+		cont( 300 );         //调用返回的函数
+		console.log(cont());
+	</script>
+</body>
+</html>
