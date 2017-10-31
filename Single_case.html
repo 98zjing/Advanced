@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Single case</title>
+</head>
+<body>
+	<button id="loginBtn">登陆</button>
+	<script>
+		// var Singleton=function(name){
+		// 	this.name = name;
+		// };
+		// Singleton.prototype.getName=function(){
+		// 	alert(this.name);
+		// };
+		// Singleton.getInstance = (function(){
+		// 	var instance = null;
+		// 	return function(name){
+		// 		if ( !instance) {
+		// 			instance = new Singleton(name);
+		// 		}
+		// 		return instance;
+		// 	}
+		// })();
+		// // var a=Singleton.getInstance( 'sevn1' );
+		// var b=Singleton.getInstance( 'sevn2' );
+		// alert( a === b );
+
+		var CreateDiv=function(html){
+			this.html=html;
+			this.init();
+		};
+		CreateDiv.prototype.init=function(){
+			var div=document.createElement('div');
+			div.innerHTML=this.html;
+			document.body.appendChild(div);
+		};
+		var ProxySingLetonCreateDiv=(function(){
+			var instance;
+			return function(html){
+				if (!instance) {		//如果是第一次创建就把new CreateDiv赋给instance，以后的调用就直接返回instance
+					instance = new CreateDiv(html);
+				}
+				return instance;		
+			}
+		})();                            //函数自我调用返回一个函数
+		var a=new ProxySingLetonCreateDiv( "sevn1" );
+		var b=new ProxySingLetonCreateDiv( "sevn2" );
+		// alert( a === b );
+		//使用命名空间
+		var MyApp = {};
+		MyApp.namespace=function(name){
+			var parts = name.split('.');
+			var current = MyApp;
+			for (var i in parts) {
+				if (!current[parts[i]]) {
+					current[parts[i]] = {};
+				}
+				current = current[parts[i]];    
+			}
+		};
+		MyApp.namespace("event");
+		MyApp.namespace("dom.style");
+		console.dir(MyApp);
+		//惰性单例  也就是在需要时才创建出对象实例  而不是页面加载好的时间就创建
+		// 1
+		// var loginLayer=(function(){
+		// 	var div=document.createElement("div");
+		// 	div.innerHTML = "我是登陆框";
+		// 	div.style.display = 'none';
+		// 	document.body.appendChild(div);
+		// 	return div;
+		// })();   //函数自我调用后返回创建的节点
+		// document.getElementById("loginBtn").onclick=function(){
+		// 	loginLayer.style.display = "block";  
+		// };
+		// // 2
+		// var createLoginLayer=(function(){
+		// 	var div;
+		// 	return function(){
+		// 		if ( !div ) {    //只有第一次才创建，后面就直接调用
+		// 			div=document.createElement("div");
+		// 			div.innerHTML = "我是登陆框";
+		// 			div.style.display = 'none';
+		// 			document.body.appendChild(div);
+		// 		}
+		// 		return div;
+		// 	}
+		// })();
+		// document.getElementById( "loginBtn" ).onclick = function(){
+		// 	var loginLayer = createLoginLayer();
+		// 	loginLayer.style.display = 'block';
+		// };
+		// 3
+		var getSiingLe = (function(){   //一个套用惰性单例函数，弥补了2中只能创建div的过失
+			var obj;
+			return function(fn){
+				return obj || ( obj = fn.apply(this,arguments));
+			} 
+		})();
+		var createLoginLayer = function(){
+			var div=document.createElement("div");
+			div.innerHTML = "我是登陆框";
+			div.style.display = 'none';
+			document.body.appendChild(div);
+			return div;
+		}
+		var createSingLeLoginLayer = getSiingLe(createLoginLayer);
+		document.getElementById( "loginBtn" ).onclick = function(){
+			var loginLayer = createSingLeLoginLayer;
+			loginLayer.style.display = 'block';
+		};
+	</script>
+</body>
+</html>
